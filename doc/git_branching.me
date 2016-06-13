@@ -1,0 +1,57 @@
+
+# reference: https://github.com/GarageGames/Torque2D/wiki/Cloning-the-repo-and-working-with-Git
+
+#################
+#   branching   #
+#################
+
+# branch creation
+git branch {branch_name}
+
+# branch deletion (local)
+git branch -D {branch_name}
+
+# switch to local branch
+git checkout {branch_name}
+
+# switch back to master
+git checkout master
+
+# pull request on local branch
+git pull origin {branch_name}
+
+#############
+#   commit  #
+#############
+
+# add, commit, push
+git add .
+git commit -am "some comment"
+git push {remote_branch_name} {branch_name}
+(e.g. git push branch_1a branch_1a_local)
+
+
+
+#############
+#   merge   #
+#############
+
+# local merge before commit
+git pull origin {branch_name}
+
+# merge to main / trunk
+in actual, make a "pull request" on github
+1. pick your remote branch
+2. "create pull request"
+3. let pomo admin handle the merge etc
+
+#############################
+#   reset/clear local file  #
+#############################
+
+git reset --soft HEAD^
+
+or
+
+git reset HEAD {file_pattern}
+
