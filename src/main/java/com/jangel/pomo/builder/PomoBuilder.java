@@ -17,6 +17,9 @@ public class PomoBuilder {
     static private Logger log = Logger.getLogger(PomoBuilder.class);
 
     private Gson gson;
+    /**
+     * the core Map storing the dynamic attributes of this POJO (pomo)
+     */
     private Map<String, IPomoItem> attributes;
     private ConfigBuilder configs;
 

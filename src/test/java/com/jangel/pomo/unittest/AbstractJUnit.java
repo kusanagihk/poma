@@ -14,7 +14,7 @@ public class AbstractJUnit {
     }
 
     public void logMethodEnd(Logger log, String methodName) {
-        if (log.isInfoEnabled()) log.info("*** "+methodName+" ended at: "+new Date()+" ***");
+        if (log.isInfoEnabled()) log.info("*** "+methodName+" ended at: "+new Date()+" ***\r\n");
     }
 
 }
