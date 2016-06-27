@@ -11,40 +11,30 @@ public class ReflectionUtil {
 
 
     /**
-     * check if the targetClass is inherited from the sourceClass
+     * check if the targetClass is inherited from the sourceClass (including interface implementation checks)
      * @param targetClassName
      * @param sourceClassName
      * @return
      */
     public boolean isInstanceOf(String targetClassName, String sourceClassName) {
-        boolean valid = false;
         Class tarClass = this.getClassFromString(targetClassName);
         Class srcClass = this.getClassFromString(sourceClassName);
 
-        if (tarClass != null && srcClass != null) {
-            Class clz;
-            Class currentTarClass = tarClass;
+        return this.isInstanceOf(tarClass, srcClass);
+    }
 
-            while ((clz = currentTarClass.getSuperclass())!=null) {
-                if (clz.equals(srcClass)) {
-                    valid = true;
-                    break;
+    /**
+     * check if the targetClass is inherited from the sourceClass (including interface implementation checks)
+     * @param targetClass
+     * @param sourceClass
+     * @return
+     */
+    public boolean isInstanceOf(Class targetClass, Class sourceClass) {
+        boolean valid = false;
 
-                } else {
-                    currentTarClass = currentTarClass.getSuperclass();
-                }
-            }   // end -- while (superclass checks)
+        if (targetClass !=null && sourceClass != null) {
+            valid = sourceClass.isAssignableFrom(targetClass);
         }
-
-        if (!valid) {
-            /*
-             * stackoverflow.com
-             * questions/10165887/how-to-check-if-an-object-implements-an-interface
-             */
-// TODO: interface checks....
-            tarClass.isAssignableFrom(Runnable.class);
-        }
-
         return valid;
     }
 
@@ -63,6 +53,38 @@ public class ReflectionUtil {
             log.error("[getClassFromString] cannot create class from the given className: " + className, e);
         }
         return clz;
+    }
+
+
+    /**
+     * create instance from the given class
+     * @param clzName
+     * @return
+     */
+    public Object createObject(String clzName) {
+        Class clz = this.getClassFromString(clzName);
+
+        return this.createObject(clz);
+    }
+
+    /**
+     * create instance from the given class
+     * @param clz
+     * @return
+     */
+    public Object createObject(Class clz) {
+        Object obj = null;
+
+        if (clz != null) {
+            try {
+                // assume have default constructor or else... exception thrown
+                obj = clz.newInstance();
+
+            } catch (Exception e) {
+                log.error("[createObject] cannot create object from default constructor, please check if the Class supplied has accessible default constructor or not: " + clz);
+            }
+        }
+        return obj;
     }
 
 
