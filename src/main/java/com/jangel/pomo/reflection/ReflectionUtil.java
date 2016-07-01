@@ -2,6 +2,8 @@ package com.jangel.pomo.reflection;
 
 import org.apache.log4j.Logger;
 
+import java.lang.reflect.Method;
+
 /**
  * Created by jl on 27/6/16.
  */
@@ -85,6 +87,44 @@ public class ReflectionUtil {
             }
         }
         return obj;
+    }
+
+
+    /**
+     * invoke a method based on the given targetObject and the methodName + parameters supplied
+     *
+     * @param targetObject
+     * @param methodName
+     * @param parameters
+     * @return
+     */
+    public Object invokeMethod(Object targetObject, String methodName, Object... parameters) {
+        Object returnVal = null;
+
+        try {
+            Method[] methods = targetObject.getClass().getDeclaredMethods();
+            Method method = null;
+
+            for (Method m : methods) {
+                if (m.getName().equals(methodName)) {
+                    Class[] params = m.getParameterTypes();
+
+                    if (params!=null && parameters!=null && params.length == parameters.length) {
+                        method = m;
+                        break;
+                    }   // end -- if (found method with matching parameters)
+                }
+            }   // end -- method m
+
+            if (method != null) {
+                returnVal = method.invoke(targetObject, parameters);
+            }
+
+        } catch (Exception e) {
+            log.error("[invokeMethod] failed to invoke the method: " + methodName + " with params: " + parameters, e);
+            throw new RuntimeException("[invokeMethod] failed to invoke the method: " + methodName + " with params: " + parameters, e);
+        }
+        return returnVal;
     }
 
 

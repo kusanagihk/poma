@@ -1,5 +1,6 @@
 package com.jangel.pomo.reflection;
 
+import com.jangel.pomo.model.BasicPomoItem;
 import com.jangel.pomo.reflection.models.TestingModelPublicAccess;
 import com.jangel.pomo.unittest.AbstractJUnit;
 import org.apache.log4j.Logger;
@@ -122,12 +123,66 @@ public class ReflectionUtilTest extends AbstractJUnit {
 
     @Test
     public void doCreateObjectByClass() {
+        this.logMethodStart(log, "doCreateObjectByClass");
+        ReflectionUtil instance = new ReflectionUtil();
+        Class class_1 = TestingModelPublicAccess.class;
+        Object finalObj;
 
+        finalObj = instance.createObject(class_1);
+        Assert.assertThat("object should be created!!", finalObj, CoreMatchers.notNullValue());
+        Assert.assertThat("object should be instance of " + class_1,
+                instance.isInstanceOf(finalObj.getClass(), TestingModelPublicAccess.class),
+                CoreMatchers.is(true));
+        log.info(class_1 + " instance > " + finalObj);
+
+
+        Class class_2 = Random.class;
+        finalObj = instance.createObject(class_2);
+        Assert.assertThat("object should be created!!", finalObj, CoreMatchers.notNullValue());
+        Assert.assertThat("object should be instance of " + class_2,
+                instance.isInstanceOf(finalObj.getClass(), Random.class),
+                CoreMatchers.is(true));
+        log.info(class_2 + " instance > " + finalObj);
+
+
+        log.info("all test(s) passed");
+        this.logMethodEnd(log, "doCreateObjectByClass");
     }
 
     @Test
     public void doInvokeMethodOnObjectByReflection() {
+        this.logMethodStart(log, "doInvokeMethodOnObjectByReflection");
+        ReflectionUtil instance = new ReflectionUtil();
+        Class targetClass = BasicPomoItem.class;
+        Object targetObject;
+        Object returnValue;
 
+        targetObject = instance.createObject(targetClass);
+        Assert.assertThat("targetObject should be created~~", targetObject, CoreMatchers.notNullValue());
+        Assert.assertThat("targetObject should be instaneof BasicPomoItem", (targetObject instanceof BasicPomoItem), CoreMatchers.is(true));
+        log.info("targetObject created, class is > " + targetObject.getClass().getCanonicalName());
+
+        returnValue = instance.invokeMethod(targetObject, "setKeyValue", "school_postCode", Integer.valueOf(1234));
+        Assert.assertThat("no return value for setKeyValue()", returnValue, CoreMatchers.nullValue());
+        log.info("calling setKeyValue() returns null value");
+
+        returnValue = instance.invokeMethod(targetObject, "getKey");
+        Assert.assertThat("getKey should return > school_postCode", returnValue.toString(), CoreMatchers.is("school_postCode"));
+        log.info("getKey should return > school_postCode");
+
+        returnValue = instance.invokeMethod(targetObject, "getValue");
+        Assert.assertThat("getValue should return > 1234", Integer.parseInt(returnValue.toString()), CoreMatchers.is(1234));
+        log.info("getValue should return > 1234");
+
+        Class returnClass;
+        returnValue = instance.invokeMethod(targetObject, "getValueClass");
+        Assert.assertThat("returnValue MUST a class instance", returnValue instanceof Class, CoreMatchers.is(true));
+        returnClass = (Class) returnValue;
+        Assert.assertThat("getValueClass should return > java.lang.Integer", returnClass.getCanonicalName(), CoreMatchers.is(Integer.class.getCanonicalName()));
+        log.info("getValueClass should return > java.lang.Integer");
+
+        log.info("all test(s) passed");
+        this.logMethodEnd(log, "doInvokeMethodOnObjectByReflection");
     }
 
 

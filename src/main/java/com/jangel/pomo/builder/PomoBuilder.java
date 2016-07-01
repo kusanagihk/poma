@@ -3,6 +3,7 @@ package com.jangel.pomo.builder;
 import com.google.gson.Gson;
 import com.jangel.pomo.model.BasicPomoItem;
 import com.jangel.pomo.model.IPomoItem;
+import com.jangel.pomo.reflection.ReflectionUtil;
 import org.apache.log4j.Logger;
 
 import java.util.HashMap;
@@ -23,6 +24,8 @@ public class PomoBuilder {
     private Map<String, IPomoItem> attributes;
     private ConfigBuilder configs;
 
+    private ReflectionUtil reflectionUtil;
+
     Object lock = new Object();
 
     /**
@@ -31,6 +34,7 @@ public class PomoBuilder {
     public PomoBuilder() {
         this.attributes = new HashMap<String, IPomoItem>();
         this.gson = new Gson();
+        this.reflectionUtil = new ReflectionUtil();
     }
 
     /**
@@ -52,6 +56,8 @@ public class PomoBuilder {
      * @return
      */
     private PomoBuilder attribute(String key, Object value) {
+        boolean processed = false;
+
         // 1) check if key, value is valid
         if (key == null || key.isEmpty() || value == null) {
             if (log.isInfoEnabled()) {
@@ -62,9 +68,27 @@ public class PomoBuilder {
 
         // 2) check if any IPomoItem is specified
         if (this.configs != null && this.configs.getPomoItemType() != null) {
-// TODO:
-        } else {
-            // default is "BasicPomoItem"
+            /*
+             *  1) new the target class
+             *  2) set the key, value to the target object
+             */
+            if (this.reflectionUtil.isInstanceOf(this.configs.getPomoItemType(), IPomoItem.class.getCanonicalName())) {
+                Object model = this.reflectionUtil.createObject(this.configs.getPomoItemType());
+                if (model != null) {
+                    // performance issue, cast to IPomoItem instead of reflection
+                    //this.reflectionUtil.invokeMethod(model, "setKeyValue", key, value);
+                    IPomoItem modelItem = (IPomoItem) model;
+
+                    modelItem.setKeyValue(key, value);
+                    this.attributes.put(key, modelItem);
+
+                    processed = true;
+                }
+            }   // end -- if (given class is instanceof IPomoItem)
+        }
+
+        // default is "BasicPomoItem"
+        if (!processed) {
             this.attributes.put(key, new BasicPomoItem(key, value));
         }
         return this;

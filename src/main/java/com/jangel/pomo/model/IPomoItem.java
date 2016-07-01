@@ -4,6 +4,9 @@ package com.jangel.pomo.model;
  * Created by jl on 15/6/16.
  */
 public interface IPomoItem {
+
+    void setKeyValue(String key, Object value);
+
     void setKey(String key);
     String getKey();
 

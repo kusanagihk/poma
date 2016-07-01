@@ -14,7 +14,16 @@ public class BasicPomoItem implements IPomoItem {
      */
     public BasicPomoItem() {}
 
+    /**
+     * ctor
+     * @param key
+     * @param value
+     */
     public BasicPomoItem(String key, Object value) {
+        this.setKeyValue(key, value);
+    }
+
+    public void setKeyValue(String key, Object value) {
         this.setKey(key);
         this.setValue(value);
         this.setValueClass(value.getClass());
