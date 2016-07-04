@@ -55,7 +55,7 @@ public class PomoBuilder {
      * @param value
      * @return
      */
-    private PomoBuilder attribute(String key, Object value) {
+    public PomoBuilder attribute(String key, Object value) {
         boolean processed = false;
 
         // 1) check if key, value is valid
@@ -112,7 +112,22 @@ public class PomoBuilder {
         return this;
     }
 
+    /**
+     * return the value associated with the given key
+     *
+     * @param key
+     * @param <T>
+     * @return
+     */
+    public <T> T getAttribute(String key) {
+        T value = null;
+        IPomoItem item = this.attributes.get(key);
 
+        if (item != null) {
+            value = (T) item.getValue();
+        }
+        return value;
+    }
 
 
 
