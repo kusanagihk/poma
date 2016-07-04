@@ -129,9 +129,70 @@ public class PomoBuilder {
         return value;
     }
 
+    public <T> T transformTo(Class clz) {
+        T target = null;
+        Set<String> attributeKeys;
 
+        target = (T) this.reflectionUtil.createObject(clz);
 
+        synchronized (lock) {
+            attributeKeys = this.attributes.keySet();
+        }
+        for (String key:attributeKeys) {
+            String setter = this.createSetterMethodNameByAttribute(key);
+            IPomoItem item = this.attributes.get(key);
 
+            this.reflectionUtil.invokeMethod(target, setter, item.getValue());
+        }   // end -- for (attributeKeys)
+
+        return target;
+    }
+
+    /**
+     * method to create the getter method name
+     *
+     * @param attribute
+     * @return
+     */
+    private String createGetterMethodNameByAttribute(String attribute) {
+        return "get" + attribute.substring(0, 1).toUpperCase() + attribute.substring(1);
+    }
+
+    /**
+     * method to create the setter method name
+     *
+     * @param attribute
+     * @return
+     */
+    private String createSetterMethodNameByAttribute(String attribute) {
+        StringBuilder sb = new StringBuilder(100);
+        String[] parts;
+
+        // replacement rule (e.g. some_value = some-value = someValue)
+        parts = attribute.split("[-_]");
+        for (String part : parts) {
+            sb.append(this.capitalize(part));
+        }   // end -- for (parts)
+        sb.insert(0, "set");
+
+        // "set" + attribute.substring(0, 1).toUpperCase() + attribute.substring(1);
+        return sb.toString();
+    }
+
+    /**
+     * capitalize the given String (only the 1st character would be upperCased)
+     *
+     * @param value
+     * @return
+     */
+    private String capitalize(String value) {
+        String val = value;
+
+        if (value != null && !value.isEmpty()) {
+            val = value.substring(0, 1).toUpperCase() + value.substring(1);
+        }   // end -- if (not null and not empty)
+        return val;
+    }
 
 
 

@@ -3,6 +3,7 @@ package com.jangel.pomo.builder;
 import com.jangel.pomo.model.BasicPomoItem;
 import com.jangel.pomo.reflection.models.TestingModelPublicAccess;
 import com.jangel.pomo.unittest.AbstractJUnit;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.apache.log4j.Logger;
 import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
@@ -43,6 +44,9 @@ public class PomoBuilderTest extends AbstractJUnit {
         attrs.put("testingObjectPublicAccess", new TestingModelPublicAccess());
     }
 
+    /**
+     * testing on creating the PomoBuilder through attributes (Map)
+     */
     @Test
     public void buildFromMapAttributes() {
         this.logMethodStart(log, "buildFromMapAttributes");
@@ -60,6 +64,10 @@ public class PomoBuilderTest extends AbstractJUnit {
         this.logMethodEnd(log, "buildFromMapAttributes");
     }
 
+    /**
+     * test on creating the PomoBuilder through some config value(s)
+     * such as setting the corresponding "KEY_POMO_ITEM_CLASS"
+     */
     @Test
     public void buildWithConfigSet() {
         this.logMethodStart(log, "buildWithConfigSet");
@@ -83,6 +91,9 @@ public class PomoBuilderTest extends AbstractJUnit {
         this.logMethodEnd(log, "buildWithConfigSet");
     }
 
+    /**
+     * test on getting back the attribute(s) of a given pomoBuilder
+     */
     @Test
     public void getAttributeValueTest() {
         this.logMethodStart(log, "getAttributeValueTest");
@@ -156,9 +167,49 @@ public class PomoBuilderTest extends AbstractJUnit {
         this.logMethodEnd(log, "getAttributeValueTest");
     }
 
+    /**
+     * test on transforming a PomoBuilder into a target Class Type
+     */
     @Test
-    public void xportTest() {
+    public void transformationTest() {
+        this.logMethodStart(log, "transformationTest");
+        PomoBuilder builder = new PomoBuilder();
+        TestingModelPublicAccess target_1;
 
+
+        builder.attribute("name", "St.Juliana");
+        builder.attribute("male", Boolean.FALSE);
+        builder.attribute("nonExistingValue", "something you never know about");
+        Assert.assertThat("builder contains entry of 'male'",
+                builder.toString().indexOf("male") > -1, CoreMatchers.is(true));
+        log.info("[builder] builder contains entry of 'male'");
+        log.info("[builder] builder toString => " + builder);
+
+        target_1 = builder.transformTo(TestingModelPublicAccess.class);
+        Assert.assertThat("target object is not null", target_1, CoreMatchers.notNullValue());
+        log.info("[target_1] target object is not null, toString => " + target_1);
+
+        // testing on attribute value replacement (e.g. some-value = some_value = someValue)
+        log.info("[target_1] test on using complex attribute names involving '-' or '_' characters");
+        builder.attribute("complex-attribute-1", "com value 1");
+        builder.attribute("complex_attribute_2", "com value 2");
+        builder.attribute("complexAttribute3", "com value 3");
+        builder.attribute("male", Boolean.TRUE);
+        // mixed _ and - characters
+        builder.attribute("complex_attribute-forTesting", "com value 4");
+        target_1 = builder.transformTo(TestingModelPublicAccess.class);
+        Assert.assertThat("complex value 1 should be 'com value 1'", target_1.getComplexAttribute1(), CoreMatchers.equalTo("com value 1"));
+        Assert.assertThat("complex value 2 should be 'com value 2'", target_1.getComplexAttribute2(), CoreMatchers.equalTo("com value 2"));
+        Assert.assertThat("complex value 3 should be 'com value 3'", target_1.getComplexAttribute3(), CoreMatchers.equalTo("com value 3"));
+        log.info("[target_1] complex attributes set successfully, toString => " + target_1);
+
+// TODO: special class type => Map (must support this type)
+
+
+
+
+        log.info("all tests have passed");
+        this.logMethodEnd(log, "transformationTest");
     }
 
 

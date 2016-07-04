@@ -118,6 +118,9 @@ public class ReflectionUtil {
 
             if (method != null) {
                 returnVal = method.invoke(targetObject, parameters);
+
+            } else {
+                log.warn("[invokeMethod] no such method found: " + methodName);
             }
 
         } catch (Exception e) {
