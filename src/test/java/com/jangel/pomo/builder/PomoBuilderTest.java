@@ -1,12 +1,14 @@
 package com.jangel.pomo.builder;
 
+import com.jangel.pomo.config.BasicConfigBuilder;
 import com.jangel.pomo.model.BasicPomoItem;
 import com.jangel.pomo.reflection.models.TestingModelPublicAccess;
 import com.jangel.pomo.unittest.AbstractJUnit;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.apache.log4j.Logger;
 import org.hamcrest.CoreMatchers;
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -44,13 +46,24 @@ public class PomoBuilderTest extends AbstractJUnit {
         attrs.put("testingObjectPublicAccess", new TestingModelPublicAccess());
     }
 
+    private PomoBuilder builder;
+
+    @Before
+    public void beforeMethod() {
+        this.builder = new PomoBuilder(BasicConfigBuilder.buildBasicConfig());
+    }
+
+    @After
+    public void afterMethod() {
+        this.builder = null;
+    }
+
     /**
      * testing on creating the PomoBuilder through attributes (Map)
      */
     @Test
     public void buildFromMapAttributes() {
         this.logMethodStart(log, "buildFromMapAttributes");
-        PomoBuilder builder = new PomoBuilder();
 
         Assert.assertThat("empty pomo", CoreMatchers.is(builder.toString()));
         log.info("a) by default the PomoBuilder has no attributes and hence return \"empty pomo\" when toString() is called.");
@@ -71,22 +84,28 @@ public class PomoBuilderTest extends AbstractJUnit {
     @Test
     public void buildWithConfigSet() {
         this.logMethodStart(log, "buildWithConfigSet");
-        PomoBuilder builder = new PomoBuilder();
-        ConfigBuilder cBuilder = new ConfigBuilder();
+        ConfigBuilder cBuilder = BasicConfigBuilder.buildBasicConfig();
+        PomoBuilder builder1 = new PomoBuilder(cBuilder);
 
         // set the PomoItemType to BasicPomoItem (yet)
         cBuilder.setPomoItemType(BasicPomoItem.class.getCanonicalName());
-        builder.config(cBuilder);
 
-        Assert.assertThat("empty pomo", CoreMatchers.is(builder.toString()));
+        // check the transformerMap
+        Map<Class, Class> transformerMap = cBuilder.getTransfomersMap();
+        Assert.assertThat("transfomerMap should not be null", transformerMap, CoreMatchers.notNullValue());
+        Assert.assertThat("transfomerMap should not be empty", transformerMap.isEmpty(), CoreMatchers.is(false));
+        log.info("0) transformerMap > " + transformerMap);
+
+
+        Assert.assertThat("empty pomo", CoreMatchers.is(builder1.toString()));
         log.info("a) by default the PomoBuilder has no attributes and hence return \"empty pomo\" when toString() is called.");
 
         // b) test on building from Map attributes at once
-        builder = builder.attributes(attrs);
-        Assert.assertThat(builder, CoreMatchers.notNullValue());
-        Assert.assertThat(builder.toString(), CoreMatchers.containsString("java.lang.String[]"));
-        Assert.assertThat(builder.toString(), CoreMatchers.containsString("java.util.ArrayList"));
-        log.info("b) builder with a Map of attributes > " + builder.toString());
+        builder1 = builder1.attributes(attrs);
+        Assert.assertThat(builder1, CoreMatchers.notNullValue());
+        Assert.assertThat(builder1.toString(), CoreMatchers.containsString("java.lang.String[]"));
+        Assert.assertThat(builder1.toString(), CoreMatchers.containsString("java.util.ArrayList"));
+        log.info("b) builder with a Map of attributes > " + builder1.toString());
 
         this.logMethodEnd(log, "buildWithConfigSet");
     }
@@ -97,7 +116,6 @@ public class PomoBuilderTest extends AbstractJUnit {
     @Test
     public void getAttributeValueTest() {
         this.logMethodStart(log, "getAttributeValueTest");
-        PomoBuilder builder = new PomoBuilder();
         Map<String, String> abilities = new HashMap<String, String>();
         String sValue;
         int iValue;
@@ -173,7 +191,6 @@ public class PomoBuilderTest extends AbstractJUnit {
     @Test
     public void transformationTest() {
         this.logMethodStart(log, "transformationTest");
-        PomoBuilder builder = new PomoBuilder();
         TestingModelPublicAccess target_1;
 
 

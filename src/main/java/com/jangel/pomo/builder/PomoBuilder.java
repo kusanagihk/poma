@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.jangel.pomo.model.BasicPomoItem;
 import com.jangel.pomo.model.IPomoItem;
 import com.jangel.pomo.reflection.ReflectionUtil;
+import com.jangel.pomo.transform.ITransformer;
 import org.apache.log4j.Logger;
 
 import java.util.HashMap;
@@ -31,23 +32,13 @@ public class PomoBuilder {
     /**
      * ctor. default ctor
      */
-    public PomoBuilder() {
+    public PomoBuilder(ConfigBuilder configs) {
         this.attributes = new HashMap<String, IPomoItem>();
         this.gson = new Gson();
         this.reflectionUtil = new ReflectionUtil();
-    }
 
-    /**
-     * set the given configs to the PomoBuilder instance
-     *
-     * @param configs
-     * @return
-     */
-    public PomoBuilder config(ConfigBuilder configs) {
         this.configs = configs;
-        return this;
     }
-
 
     /**
      *
@@ -129,74 +120,54 @@ public class PomoBuilder {
         return value;
     }
 
-    public <T> T transformTo(Class clz) {
-        T target = null;
-        Set<String> attributeKeys;
-
-        target = (T) this.reflectionUtil.createObject(clz);
+    /**
+     * return the Set of Keys associated with the available attribute(s)
+     *
+     * @return
+     */
+    public Set<String> attributeKeys() {
+        Set<String> keys;
 
         synchronized (lock) {
-            attributeKeys = this.attributes.keySet();
+            keys = this.attributes.keySet();
         }
-        for (String key:attributeKeys) {
-            String setter = this.createSetterMethodNameByAttribute(key);
-            IPomoItem item = this.attributes.get(key);
+        return keys;
+    }
 
-            this.reflectionUtil.invokeMethod(target, setter, item.getValue());
-        }   // end -- for (attributeKeys)
+    public <T> T transformTo(Class clz) {
+        T target;
+        Map<Class, Class> transformerMap = this.configs.getTransfomersMap();
+        Class transformerClass = transformerMap.get(clz);
+        ITransformer transformer;
+        /*
+            1) add a repository of transformer(s) (interface ITransformer)
+            2) try to get the ITransformer by clz
+            3) if valid use that Transformer
+            4) else use the default Transformer
+            5) maybe Map is a special ITransformer instance though... (done at step 3)
+         */
+        if (transformerClass == null) {
+            if (log.isInfoEnabled()) log.info("*** transformerClass : get default as no match by key-class");
+            // get default ITransformer
+            transformerClass = transformerMap.get(Object.class);
+        }
+
+        if (log.isInfoEnabled()) log.info("*** transformerClass : " + transformerClass);
+
+        // create the ITransformer instance
+        transformer = (ITransformer) this.reflectionUtil.createObject(transformerClass);
+
+        // transform
+        target = transformer.transformTo(this, clz);
 
         return target;
     }
 
-    /**
-     * method to create the getter method name
-     *
-     * @param attribute
-     * @return
-     */
-    private String createGetterMethodNameByAttribute(String attribute) {
-        return "get" + attribute.substring(0, 1).toUpperCase() + attribute.substring(1);
-    }
 
     /**
-     * method to create the setter method name
      *
-     * @param attribute
      * @return
      */
-    private String createSetterMethodNameByAttribute(String attribute) {
-        StringBuilder sb = new StringBuilder(100);
-        String[] parts;
-
-        // replacement rule (e.g. some_value = some-value = someValue)
-        parts = attribute.split("[-_]");
-        for (String part : parts) {
-            sb.append(this.capitalize(part));
-        }   // end -- for (parts)
-        sb.insert(0, "set");
-
-        // "set" + attribute.substring(0, 1).toUpperCase() + attribute.substring(1);
-        return sb.toString();
-    }
-
-    /**
-     * capitalize the given String (only the 1st character would be upperCased)
-     *
-     * @param value
-     * @return
-     */
-    private String capitalize(String value) {
-        String val = value;
-
-        if (value != null && !value.isEmpty()) {
-            val = value.substring(0, 1).toUpperCase() + value.substring(1);
-        }   // end -- if (not null and not empty)
-        return val;
-    }
-
-
-
-
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(100);
