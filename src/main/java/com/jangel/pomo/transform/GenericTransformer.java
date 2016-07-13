@@ -35,9 +35,11 @@ public class GenericTransformer implements ITransformer {
 
         for (String key : keys) {
             String setter = this.createSetterMethodNameByAttribute(key);
-            IPomoItem item = builder.getAttribute(key);
+            Object value = builder.getAttribute(key);
+            //IPomoItem item = builder.getAttribute(key);
 
-            this.reflectionUtil.invokeMethod(target, setter, item.getValue());
+            //this.reflectionUtil.invokeMethod(target, setter, item.getValue());
+            this.reflectionUtil.invokeMethod(target, setter, value);
         }   // end -- for (keys)
         return target;
     }
