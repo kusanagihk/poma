@@ -129,9 +129,38 @@ public class PomoBuilder {
         return value;
     }
 
+    /**
+     * return the Set of Keys associated with the available attribute(s)
+     *
+     * @return
+     */
+    public Set<String> attributeKeys() {
+        Set<String> keys;
+
+        synchronized (lock) {
+            keys = this.attributes.keySet();
+        }
+        return keys;
+    }
+
     public <T> T transformTo(Class clz) {
-        T target = null;
+        T target;
+        Map<Class, Class> transformerMap = this.configs.getTransfomersMap();
+        Class transformerClass = transformerMap.get(clz);
+
+        
+
+
         Set<String> attributeKeys;
+
+/*
+    TODO:
+            1) add a repository of transformer(s) (interface ITransformer)
+            2) try to get the ITransformer by clz
+            3) if valid use that Transformer
+            4) else use the default Transformer
+            5) maybe Map is a special ITransformer instance though... (done at step 3)
+ */
 
         target = (T) this.reflectionUtil.createObject(clz);
 

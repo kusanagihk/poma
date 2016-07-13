@@ -1,5 +1,6 @@
 package com.jangel.pomo.builder;
 
+import com.jangel.pomo.config.BasicConfigBuilder;
 import com.jangel.pomo.model.BasicPomoItem;
 import com.jangel.pomo.reflection.models.TestingModelPublicAccess;
 import com.jangel.pomo.unittest.AbstractJUnit;
@@ -72,11 +73,18 @@ public class PomoBuilderTest extends AbstractJUnit {
     public void buildWithConfigSet() {
         this.logMethodStart(log, "buildWithConfigSet");
         PomoBuilder builder = new PomoBuilder();
-        ConfigBuilder cBuilder = new ConfigBuilder();
+        ConfigBuilder cBuilder = BasicConfigBuilder.buildBasicConfig();
 
         // set the PomoItemType to BasicPomoItem (yet)
         cBuilder.setPomoItemType(BasicPomoItem.class.getCanonicalName());
         builder.config(cBuilder);
+
+        // check the transformerMap
+        Map<Class, Class> transformerMap = cBuilder.getTransfomersMap();
+        Assert.assertThat("transfomerMap should not be null", transformerMap, CoreMatchers.notNullValue());
+        Assert.assertThat("transfomerMap should not be empty", transformerMap.isEmpty(), CoreMatchers.is(false));
+        log.info("0) transformerMap > " + transformerMap);
+
 
         Assert.assertThat("empty pomo", CoreMatchers.is(builder.toString()));
         log.info("a) by default the PomoBuilder has no attributes and hence return \"empty pomo\" when toString() is called.");
