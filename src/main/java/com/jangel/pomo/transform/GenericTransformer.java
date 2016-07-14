@@ -1,7 +1,6 @@
 package com.jangel.pomo.transform;
 
 import com.jangel.pomo.builder.PomoBuilder;
-import com.jangel.pomo.model.IPomoItem;
 import com.jangel.pomo.reflection.ReflectionUtil;
 
 import java.util.Set;
@@ -31,14 +30,12 @@ public class GenericTransformer implements ITransformer {
         Set<String> keys;
 
         target = (T) this.reflectionUtil.createObject(clz);
-        keys = builder.attributeKeys();
+        keys = builder.getAttributeKeys();
 
         for (String key : keys) {
             String setter = this.createSetterMethodNameByAttribute(key);
             Object value = builder.getAttribute(key);
-            //IPomoItem item = builder.getAttribute(key);
 
-            //this.reflectionUtil.invokeMethod(target, setter, item.getValue());
             this.reflectionUtil.invokeMethod(target, setter, value);
         }   // end -- for (keys)
         return target;

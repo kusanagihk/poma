@@ -16,7 +16,7 @@ public class MapTransformer implements ITransformer {
      */
     public <T> T transformTo(PomoBuilder builder, Class clz) {
         Map<String, Object> target = new HashMap<String, Object>();
-        Set<String> keys = builder.attributeKeys();
+        Set<String> keys = builder.getAttributeKeys();
 
         for (String key : keys) {
             target.put(key, builder.getAttribute(key));

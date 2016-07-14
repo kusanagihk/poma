@@ -244,6 +244,29 @@ public class PomoBuilderTest extends AbstractJUnit {
         this.logMethodEnd(log, "transformationTest");
     }
 
+// TODO: test on Complex attributes (e.g. another POJO under a key)
+    
+
+    @Test
+    public void clearAttributesTest() {
+        this.logMethodStart(log, "clearAttributesTest");
+        int size;
+
+        builder.attribute("key-A", "this is key A").
+                attribute("key-B", 222).
+                attribute("key-C", 8999.1)
+        ;
+        log.info("attributes b4 clear => " + builder);
+
+        size = builder.clearAttributes();
+        Assert.assertThat("size should be 3", size, CoreMatchers.is(3));
+
+        log.info("builder should be empty now => " + builder);
+
+        log.info("all tests passed");
+        this.logMethodEnd(log, "clearAttributesTest");
+    }
+
 
     /**
      * for testing purpose only

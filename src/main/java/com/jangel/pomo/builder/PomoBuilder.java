@@ -125,7 +125,7 @@ public class PomoBuilder {
      *
      * @return
      */
-    public Set<String> attributeKeys() {
+    public Set<String> getAttributeKeys() {
         Set<String> keys;
 
         synchronized (lock) {
@@ -134,6 +134,12 @@ public class PomoBuilder {
         return keys;
     }
 
+    /**
+     * transform the given attributes to the given Class type
+     * @param clz
+     * @param <T>
+     * @return
+     */
     public <T> T transformTo(Class clz) {
         T target;
         Map<Class, Class> transformerMap = this.configs.getTransfomersMap();
@@ -161,6 +167,21 @@ public class PomoBuilder {
         target = transformer.transformTo(this, clz);
 
         return target;
+    }
+
+    /**
+     * remove all attributes
+     *
+     * @return
+     */
+    public int clearAttributes() {
+        int size;
+
+        synchronized (lock) {
+            size = this.attributes.size();
+            this.attributes.clear();
+        }
+        return size;
     }
 
 
