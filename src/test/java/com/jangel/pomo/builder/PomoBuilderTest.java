@@ -192,6 +192,8 @@ public class PomoBuilderTest extends AbstractJUnit {
     public void transformationTest() {
         this.logMethodStart(log, "transformationTest");
         TestingModelPublicAccess target_1;
+        Map target_2_map_generic;
+        HashMap target_2_hashmap_generic;
 
 
         builder.attribute("name", "St.Juliana");
@@ -220,10 +222,23 @@ public class PomoBuilderTest extends AbstractJUnit {
         Assert.assertThat("complex value 3 should be 'com value 3'", target_1.getComplexAttribute3(), CoreMatchers.equalTo("com value 3"));
         log.info("[target_1] complex attributes set successfully, toString => " + target_1);
 
-// TODO: special class type => Map (must support this type)
+        // special class type => Map (must support this type)
+        log.info("\r\n[target_2_map_generic] test on using a MapTransformer");
+        target_2_map_generic = builder.transformTo(Map.class);
+        Assert.assertThat("map should not be null, transformable", target_2_map_generic, CoreMatchers.notNullValue());
+        Assert.assertThat("map should not be empty, transformable", target_2_map_generic.isEmpty(), CoreMatchers.is(false));
+        Assert.assertThat("should have item 'complex-attribute-1'",
+                target_2_map_generic.get("complex-attribute-1").toString(), CoreMatchers.is("com value 1"));
+        log.info("[target_2_map_generic] map transformed successfully => " + target_2_map_generic);
 
-
-
+        // special class type => Map (must support this type)
+        log.info("\r\n[target_2_hashmap_generic] test on using a MapTransformer");
+        target_2_hashmap_generic = builder.transformTo(Map.class);
+        Assert.assertThat("hmap should not be null, transformable", target_2_hashmap_generic, CoreMatchers.notNullValue());
+        Assert.assertThat("hmap should not be empty, transformable", target_2_hashmap_generic.isEmpty(), CoreMatchers.is(false));
+        Assert.assertThat("should have item 'complex-attribute-1'",
+                target_2_hashmap_generic.get("nonExistingValue").toString(), CoreMatchers.is("something you never know about"));
+        log.info("[target_2_hashmap_generic] map transformed successfully => " + target_2_hashmap_generic);
 
         log.info("all tests have passed");
         this.logMethodEnd(log, "transformationTest");
