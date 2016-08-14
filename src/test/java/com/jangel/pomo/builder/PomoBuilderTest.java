@@ -245,7 +245,7 @@ public class PomoBuilderTest extends AbstractJUnit {
     }
 
 // TODO: test on Complex attributes (e.g. another POJO under a key)
-    
+
 
     @Test
     public void clearAttributesTest() {
